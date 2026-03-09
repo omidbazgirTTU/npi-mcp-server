@@ -41,5 +41,4 @@ vercel
 vercel deploy --prod
 ```
 
-After deployment, hit the endpoint at `https://<deployment>.vercel.app/api/mcp.py` using the standard
-MCP initialize + call flow (same headers/body as other FastMCP endpoints).
+After deployment, use the cleaner endpoint `https://<deployment>.vercel.app/mcp` with MCP Inspector or ChatGPT MCP apps. (The legacy `/api/mcp.py` path still works via rewrite, but `/mcp` is the canonical URL.)
