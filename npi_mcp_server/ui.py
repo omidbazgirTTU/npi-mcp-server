@@ -15,6 +15,7 @@ WIDGET_URIS = {
     "taxonomy_autocomplete": "ui://npi-mcp/taxonomy-autocomplete.html",
     "verification_results": "ui://npi-mcp/verification-results.html",
     "nearby_providers": "ui://npi-mcp/nearby-providers.html",
+    "org_lookup": "ui://npi-mcp/org-lookup.html",
 }
 
 

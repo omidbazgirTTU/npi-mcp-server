@@ -367,3 +367,62 @@ def _taxonomy_matches(taxonomy: Dict[str, Any], needle: str) -> bool:
     code = (taxonomy.get("code") or "").lower()
     needle = needle.lower()
     return needle in description or needle == code
+
+
+def organizations_by_geo(
+    *,
+    postal_code: Optional[str] = None,
+    city: Optional[str] = None,
+    state: Optional[str] = None,
+    specialty: Optional[str] = None,
+    limit: Optional[int] = 50,
+) -> Dict[str, Any]:
+    """Return distinct organization names (NPI-2) for a geography."""
+
+    params: Dict[str, Any] = {
+        "postal_code": postal_code,
+        "city": city,
+        "state": state,
+        "taxonomy_description": specialty,
+        "enumeration_type": "NPI-2",
+        "limit": limit,
+    }
+    data = query_registry(params)
+    results = data.get("results") or []
+    organizations: List[Dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+
+    for entry in results:
+        basic = entry.get("basic") or {}
+        name = basic.get("organization_name") or entry.get("basic", {}).get("first_name")
+        if not name:
+            continue
+        npi_number = entry.get("number")
+        key = (name.lower(), npi_number)
+        if key in seen:
+            continue
+        seen.add(key)
+        address = _normalize_address(entry)
+        taxonomies = _normalize_taxonomies(entry)
+        organizations.append(
+            {
+                "npi": npi_number,
+                "name": name,
+                "city": address.get("city"),
+                "state": address.get("state"),
+                "postal_code": (address.get("postal_code") or "").split("-")[0],
+                "primary_taxonomy": next(
+                    (tax.get("description") for tax in taxonomies if tax.get("primary")), None
+                ),
+            }
+        )
+
+    summary = {
+        "result_count": len(organizations),
+        "raw_result_count": data.get("result_count"),
+        "state": state,
+        "city": city,
+        "postal_code": postal_code,
+        "specialty": specialty,
+    }
+    return {"summary": summary, "organizations": organizations}

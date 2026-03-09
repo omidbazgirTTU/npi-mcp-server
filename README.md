@@ -5,6 +5,7 @@ FastMCP wrapper around the CMS NPI Registry (https://npiregistry.cms.hhs.gov/). 
 - `search_npi_registry` – flexible provider lookups across names, NPIs, organizations, taxonomies, geography, license filters, and gender/sole-proprietor flags.
 - `list_org_investigators` – list principal investigators (individual NPIs) within an organization, optionally narrowed by specialty/taxonomy and city/state.
 - `get_org_roster_snapshot` – condensed roster view (NPI + primary taxonomy + city/state) for quick exports.
+- `list_organizations_by_geo` – discover distinct organization names (NPI-2) in a target ZIP/city/state to help seed PI lookups.
 - `autocomplete_provider_taxonomy` – lightweight taxonomy/keyword autocomplete to help users select valid specialties.
 - `verify_npi_roster` – batch validator for NPIs or investigator rosters; flags mismatches or missing records.
 - `find_nearby_providers` – ranks providers near a reference ZIP code using USPS centroids and approximate distance calculations.
@@ -87,6 +88,20 @@ Batch-verify NPIs:
     ]
   }
 }
+
+Discover organizations in San Francisco ZIP 94143:
+
+```json
+{
+  "method": "list_organizations_by_geo",
+  "params": {
+    "postal_code": "94143",
+    "state": "CA",
+    "specialty": "Cardiology",
+    "limit": 20
+  }
+}
+```
 ```
 ```
 ```

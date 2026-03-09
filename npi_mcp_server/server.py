@@ -13,6 +13,7 @@ from .registry import (
     autocomplete_taxonomy,
     nearby_providers,
     organization_roster_snapshot,
+    organizations_by_geo,
     search_npi,
     search_org_investigators,
     verify_npi_batch,
@@ -144,6 +145,28 @@ def get_org_roster_snapshot(
     )
     result["ui"] = {
         "widgetUri": WIDGET_URIS.get("org_roster"),
+        "data": result,
+    }
+    return result
+
+
+@server.tool(description="List distinct organizations (NPI-2) for a geography.")
+def list_organizations_by_geo(
+    postal_code: str | None = None,
+    city: str | None = None,
+    state: str | None = None,
+    specialty: str | None = None,
+    limit: int | None = 50,
+) -> dict[str, Any]:
+    result = organizations_by_geo(
+        postal_code=postal_code,
+        city=city,
+        state=state,
+        specialty=specialty,
+        limit=limit,
+    )
+    result["ui"] = {
+        "widgetUri": WIDGET_URIS.get("org_lookup"),
         "data": result,
     }
     return result
