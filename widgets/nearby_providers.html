@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Nearby Providers</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #f7fafc; margin: 0; padding: 12px; }
+      h1 { font-size: 16px; margin: 0 0 8px; color: #0f172a; }
+      .summary { font-size: 12px; color: #475569; margin-bottom: 10px; }
+      .card { background: #fff; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); }
+      .name { font-weight: 600; color: #111827; font-size: 14px; }
+      .distance { font-size: 12px; color: #0f9d58; font-weight: 600; }
+      .taxonomy { font-size: 12px; color: #4338ca; margin: 4px 0; }
+      .loc { font-size: 12px; color: #475569; }
+    </style>
+  </head>
+  <body>
+    <h1>Nearby Providers</h1>
+    <div class="summary" id="summary"></div>
+    <div id="cards"></div>
+    <script>
+      function formatName(basic = {}) {
+        return [basic.first_name, basic.last_name].filter(Boolean).join(" ") || "Unknown Provider";
+      }
+      function primaryTaxonomy(taxonomies = []) {
+        const primary = taxonomies.find((tax) => tax.primary);
+        return primary ? primary.description || primary.code : (taxonomies[0]?.description) || "—";
+      }
+      window.renderNearbyProviders = function ({ summary = {}, providers = [] } = {}) {
+        const summaryDiv = document.getElementById("summary");
+        summaryDiv.textContent = `${providers.length} providers within ${summary.radius_miles || ""} miles of ZIP ${summary.postal_code || ""}`;
+        const container = document.getElementById("cards");
+        container.innerHTML = "";
+        providers.forEach((provider) => {
+          const address = provider.address || {};
+          const div = document.createElement("div");
+          div.className = "card";
+          div.innerHTML = `
+            <div class="name">${formatName(provider.basic)}</div>
+            <div class="taxonomy">${primaryTaxonomy(provider.taxonomies || [])}</div>
+            <div class="loc">${[address.city, address.state].filter(Boolean).join(", ")}</div>
+            <div class="distance">${provider.distance_miles != null ? provider.distance_miles + " mi" : ""}</div>
+          `;
+          container.appendChild(div);
+        });
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>NPI Provider Results</title>
+    <style>
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f7f8fa; margin: 0; padding: 12px; }
+      h1 { font-size: 16px; margin: 0 0 10px; color: #0f172a; }
+      table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08); }
+      th, td { font-size: 12px; padding: 10px; border-bottom: 1px solid #eef2f7; text-align: left; color: #1e293b; }
+      th { background: #f1f5f9; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; color: #475569; }
+      tr:last-child td { border-bottom: none; }
+      .badge { display: inline-block; padding: 2px 6px; font-size: 11px; border-radius: 8px; background: #e0e7ff; color: #4338ca; margin-right: 4px; }
+      .summary { font-size: 12px; color: #475569; margin-bottom: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Provider Matches</h1>
+    <div id="summary" class="summary"></div>
+    <div class="table-wrapper">
+      <table id="provider-table">
+        <thead>
+          <tr>
+            <th>NPI</th>
+            <th>Name</th>
+            <th>Primary Taxonomy</th>
+            <th>City / State</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <script>
+      function formatName(basic = {}) {
+        return [basic.first_name, basic.last_name].filter(Boolean).join(" ");
+      }
+      function primaryTaxonomy(taxonomies = []) {
+        const primary = taxonomies.find((tax) => tax.primary);
+        return primary ? primary.description || primary.code : (taxonomies[0] && (taxonomies[0].description || taxonomies[0].code)) || "—";
+      }
+      window.renderProviderResults = function ({ providers = [], summary = {} } = {}) {
+        const tbody = document.querySelector("#provider-table tbody");
+        tbody.innerHTML = "";
+        providers.forEach((provider) => {
+          const tr = document.createElement("tr");
+          const address = provider.address || {};
+          tr.innerHTML = `
+            <td>${provider.npi || ""}</td>
+            <td>${formatName(provider.basic || {})}</td>
+            <td>${primaryTaxonomy(provider.taxonomies || [])}</td>
+            <td>${[address.city, address.state].filter(Boolean).join(", ")}</td>
+            <td>${address.telephone_number || "—"}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        const summaryDiv = document.getElementById("summary");
+        summaryDiv.textContent = `${summary.result_count || providers.length} providers • last updated ${summary.last_updated || "—"}`;
+      };
+    </script>
+  </body>
+</html>
